@@ -45,3 +45,20 @@ $RECYCLE.BIN/
 Network Trash Folder
 Temporary Items
 .apdisk
+*.hex
+*.hxl
+*.bak
+/listings
+/objects
+*.OBJ
+*.LST
+*.A51
+*.htm
+*.M51
+*.lnp
+MusicData.c
+MusicDataMP3 - 副本.c
+MusicDataMP3.c
+TestMain - 副本.c
+1
+1.plg
