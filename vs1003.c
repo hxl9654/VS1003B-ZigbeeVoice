@@ -1,6 +1,6 @@
 #include "vs1003.h"
-#include "MusicDataMP3.c"
 #include "UART.h"
+#include "queue.h"
 
 #include <intrins.h>
 
@@ -283,15 +283,6 @@ void VsSineTest(void)
 	MP3_XDCS = 1;
  }
 
-void VS1003_PlayFile(unsigned char *dat, unsigned int len);
-
-void TestVS1003B(void)
-{
-	Mp3Reset();
-	VsSineTest();
-	Mp3SoftReset();
-//	VS1003_PlayFile(MusicData, sizeof(MusicData));
-}
 //写数据，音乐数据
 void VS1003B_WriteDAT(unsigned char dat)
 {
@@ -320,30 +311,22 @@ void VS1003B_Fill2048Zero()
 		}
 	}
 }
-
-
-void VS1003_PlayFile(unsigned char *dat, unsigned int len) 
-{
-    unsigned int data_pointer = 0;
-	unsigned char i;
-	
-	Mp3Reset();
-    while(len > 0)
-  	{ 
-	   if(MP3_DREQ)
-      	{
-    		for(i=0;i<32;i++)
-           	{
-     			VS1003B_WriteDAT(dat[data_pointer]);
-     			data_pointer++;
-            }
-			len -= 32;
-         }
-    }
-	VS1003B_Fill2048Zero();
-}
 sbit P10 = P1 ^ 0;
 sbit P11 = P1 ^ 1;
+unsigned char temp[32] = {0};
+void VS1003_Play() 
+{
+	unsigned char i = 0;
+	while(MP3_DREQ)
+	{		
+		//P11 = ~ P11;
+		if(QueueOut(temp, 32) == 1)
+			return;
+		for(i = 0; i < 32; i++)
+			VS1003B_WriteDAT(temp[i]);
+	}
+}
+
 xdata unsigned char db[550] = {0};
 sbit P37 = P3 ^ 7;
 void VS1003BRecord()

@@ -27,13 +27,10 @@
 #include<reg51.h>
 #include<UART.h>
 
-#ifndef UART_BUFF_MAX
-#define UART_BUFF_MAX 1100
-#endif // 如果没有定义BUFFMAX，则默认为64
+#define UART_BUFF_MAX 320
 
-#ifndef XTAL
 #define XTAL 22.118400
-#endif //如果没有定义晶振频率，则默认为11.0592M晶振
+
 sfr AUXR = 0x8E;
 extern void UART_Action(unsigned char *dat, unsigned int len);
 //此函数须另行编写：当串口完成一个字符串结束后会自动调用
@@ -111,7 +108,7 @@ void UART_SendString(unsigned char *dat, unsigned int len)
 *作者：何相龙
 *日期：2014年12月9日
 *////////////////////////////////////////////////////////////////////////////////////
-unsigned char UART_Read(unsigned char *to, unsigned int len)
+unsigned int UART_Read(unsigned char *to, unsigned int len)
 {
 	unsigned int i;
 	if(UART_BuffIndex < len)len = UART_BuffIndex;   //获取当前接收数据的位数
@@ -159,21 +156,22 @@ void UART_Driver()
 *////////////////////////////////////////////////////////////////////////////////////
 void UART_RxMonitor(unsigned char ms)
 {
-	static unsigned char ms30 = 0;                  //30毫秒计时
-	static unsigned int UART_BuffIndex_Backup;     //串口数据暂存数组位置备份
+	static unsigned char ms10 = 0;                  //10毫秒计时
+	static unsigned int UART_BuffIndex_Backup;      //串口数据暂存数组位置备份
 	if(! UART_ResiveStringFlag)return ;             //如果当前没有在接受数据，直接退出函数
-    ms30 += ms;                                     //每一次定时器中断，表示时间过去了若干毫秒
+    ms10 += ms;                                     //每一次定时器中断，表示时间过去了若干毫秒
+	
 	if(UART_BuffIndex_Backup != UART_BuffIndex)     //如果串口数据暂存数组位置备份不等于串口接收缓冲区当前位置（接收到了新数据位）
 	{
 		UART_BuffIndex_Backup = UART_BuffIndex;     //记录当前的串口接收缓冲区位置
-		ms30 = 0;                                   //复位30毫秒计时
+		ms10 = 0;                                   //复位10毫秒计时
 	}
-	if(ms30 > 30)                                   //30毫秒到了
-		{
-			ms30 = 0;                               //复位30毫秒计时
-			UART_ResiveStringEndFlag = 1;           //设置串口字符串接收全部完成标志
-			UART_ResiveStringFlag = 0;              //清空串口字符串正在接收标志
-		}
+	if(ms10 > 10)                                   //10毫秒到了
+	{
+		ms10 = 0;                               	//复位10毫秒计时
+		UART_ResiveStringEndFlag = 1;           	//设置串口字符串接收全部完成标志
+		UART_ResiveStringFlag = 0;              	//清空串口字符串正在接收标志
+	}
 }
 /*///////////////////////////////////////////////////////////////////////////////////
 *函数名：interrupt_UART
