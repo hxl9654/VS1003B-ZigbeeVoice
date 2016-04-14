@@ -23,7 +23,7 @@ void UART_Conf(unsigned int baud);
 *       参数类型：unsigned char型数据
 *       参数描述：要发送的字符串的长度
 *////////////////////////////////////////////////////////////////////////////////////
-void UART_SendString(unsigned char *dat,unsigned char len);
+void UART_SendString(unsigned char *dat,unsigned int len);
 /*///////////////////////////////////////////////////////////////////////////////////
 *函数名：UART_RxMonitor
 *函数功能：串口字符串接收结束判断，在定时器0中断函数中调用
