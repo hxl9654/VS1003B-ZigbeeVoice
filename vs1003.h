@@ -1,4 +1,3 @@
-
 /* Include processor definition */
 #include <Reg52.H>
 
@@ -36,17 +35,6 @@
 #define SM_ADPCM        0x1000   
 #define SM_ADPCM_HP     0x2000 
 
-//LPC2103与vs1003的接口定义
-/*
-  I/O         NAME
-  P0.24        /xCS
-  P0.25        /xDCS
-  P0.4        SCLK
-  P0.5        SO
-  P0.6        SI        
-  P0.16      DREQ    
-  P0.27       /xRESET 
-*/
 
 #define Mp3SetVolume(leftchannel_rightchannel){Mp3WriteRegister(11,(leftchannel_rightchannel));}//音量设置 
 		
@@ -60,17 +48,6 @@ void  VsSineTest(void);//vs1003的正弦测试
 void  Mp3WriteRegister(unsigned char addressbyte,unsigned int databyte);//写vs1003寄存器
 unsigned int Mp3ReadRegister(unsigned char addressbyte);//读vs1003寄存器
 
-
-//开启环绕声
-void VS1003B_SetVirtualSurroundOn(void);
-
-//关闭环绕声
-void VS1003B_SetVirtualSurroundOff(void);
-
-//增强重音
-//入口参数	1.强度0-15
-//			2.频率0-15 (X10Hz)
-//void VS1003B_SetBassEnhance(uchar ucValue, ucFrequencyID);
 
 
 

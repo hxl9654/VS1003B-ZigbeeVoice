@@ -169,8 +169,6 @@ void Mp3SoftReset(void)
 	wait(1); //延时1ms
 	while (MP3_DREQ == 0); //等待软件复位结束
 	Mp3WriteRegister(SPI_CLOCKF, 0x4430);
-	Mp3WriteRegister (SPI_AUDATA, 0xBB81); //采样率48k，立体声
-	Mp3WriteRegister(SPI_BASS, 0x0055);//设置重音
 	Mp3SetVolume(0x1414);//设置音量
     wait(1); //延时1ms
     	
@@ -201,7 +199,6 @@ void Mp3Reset(void)
 	while (MP3_DREQ == 0);//等待DREQ为高
 
     wait(200);            //延时100ms
- 	Mp3SetVolume(0x1414);  
     Mp3SoftReset();//vs1003软复位
 }
 /***********************************************************/
@@ -304,119 +301,6 @@ void VS1003B_WriteDAT(unsigned char dat)
 	MP3_XCS = 1;
 }
 
-//开启环绕声
-void VS1003B_SetVirtualSurroundOn(void)
-{
-	uchar ucRepeatCount;
-	uint uiModeValue;
-
-	ucRepeatCount =0;
-
-	while(1)//写时钟寄存器
-	{
-		uiModeValue = Mp3ReadRegister(0x00);
-		if(uiModeValue & 0x0001)
-		{
-			break;
-		}
-		else
-		{
-			uiModeValue |= 0x0001;
-			Mp3WriteRegister(0,uiModeValue);
-		}
-		ucRepeatCount++;
-		if(ucRepeatCount++ >10 )break;
-	}
-
-}
-
-//关闭环绕声
-void VS1003B_SetVirtualSurroundOff(void)
-{
-	uchar ucRepeatCount;
-	uint uiModeValue;
-
-	ucRepeatCount =0;
-
-	while(1)//写时钟寄存器
-	{
-		uiModeValue = Mp3ReadRegister(0x00);
-		if(uiModeValue & 0x0001)
-		{
-			break;
-		}
-		else
-		{
-			uiModeValue |= 0x0001;
-			Mp3WriteRegister(0,uiModeValue);
-		}
-		ucRepeatCount++;
-		if(ucRepeatCount++ >10 )break;
-	}
-
-}
-
-//增强重音
-//入口参数	1.强度0-15
-//			2.频率0-15 (X10Hz)
-void VS1003B_SetBassEnhance(uchar ucValue, ucFrequencyID)
-{
-	uchar ucRepeatCount;
-	uint uiWriteValue;
-	uint uiReadValue;	
-
-	ucRepeatCount =0;
-
-	uiWriteValue = Mp3ReadRegister(0x02);
-
-	uiWriteValue &= 0xFF00;
-	uiWriteValue |= ucValue<<4;
-	uiWriteValue &= (ucFrequencyID & 0x0F);
-
-	while(1)//写时钟寄存器
-	{
-
-		Mp3WriteRegister(2,uiWriteValue);
-		uiReadValue = Mp3ReadRegister(0x02);
-		
-		if(uiReadValue == uiWriteValue)
-		{
-			break;
-		}
-		ucRepeatCount++;
-		if(ucRepeatCount++ >10 )break;
-	}
-
-}
-
-//VS1003初始化，0成功 1失败
-unsigned char VS1003B_Init()
-{
-	unsigned char retry;
-	Mp3Reset();
-	retry=0;
-	while(Mp3ReadRegister(0x00) != SM_SDINEW | SM_SDISHARE)//写mode寄存器
-	{
-		Mp3WriteRegister(0x00,SM_SDINEW | SM_SDISHARE);
-		if(retry++ >10 )break;//{PORTB|=_BV(PB1);break;}
-	}
-	retry=0;
-	while(Mp3ReadRegister(0x03) != 0x4430)//写时钟寄存器
-	{
-		Mp3WriteRegister(0x03,0x4430);
-		if(retry++ >10 )break;
-	}
-	retry=0;
-	while(Mp3ReadRegister(0x0b) != 0x1414)//设音量
-	{
-		Mp3WriteRegister(0x0b,0x1414);
-		if(retry++ >10 )break;
-	}
-	if(retry > 10)return 1;
-	return 0;
-}
-
-
 void VS1003B_Fill2048Zero()
 {
 	unsigned char i,j;
@@ -467,9 +351,7 @@ sbit P37 = P3 ^ 7;
 void VS1003BRecord()
 {
 	unsigned int wwwww = 0, idx = 0;
-	unsigned char aaaaa = 0;
-	VS1003B_Init();
-	Mp3SetVolume(1414); /* Recording monitor volume */
+	Mp3SetVolume(0x1414); /* Recording monitor volume */
 	Mp3WriteRegister(SPI_BASS, 0); /* Bass/treble disabled */
 	Mp3WriteRegister(SPI_CLOCKF, 0x4430); /* 2.0x 12.288MHz */
 	wait(100);
@@ -487,11 +369,9 @@ void VS1003BRecord()
 		while(1)
 		{
 			wwwww = Mp3ReadRegister(SPI_HDAT1);	
-			//aaaaa = (unsigned char)(wwwww / 256);			
 			if(wwwww < 256)P10 = 0;
-			else if(wwwww > 896)P11 = 0;
-			else break;
-			//SBUF = aaaaa;			
+			else if(wwwww >= 896)P11 = 0;
+			else break;	
 		} /* wait until 512 bytes available */
 		P10 = 1;
 		P11 = 1;		

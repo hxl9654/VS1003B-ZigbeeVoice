@@ -29,8 +29,8 @@ void main(void)
 	while(1)
 	{
 		InitPortVS1003();
-		VS1003BRecord();
-		//TestVS1003B();
+		//VS1003BRecord();
+		TestVS1003B();
 		UART_Driver();
 	}
 }
