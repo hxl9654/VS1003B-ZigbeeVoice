@@ -17,9 +17,9 @@ sbit  MP3_XRESET  = P3^2;
 sbit MP3_XCS = P3^3;
 sbit MP3_XDCS  = P3^4;
 sbit MP3_DREQ = P3^5;
-sbit c_SPI_SI = P1^5;
-sbit c_SPI_SO = P1^6;
-sbit c_SPI_CLK = P1^7;
+sbit c_SPI_SI = P1^3;
+sbit c_SPI_SO = P1^4;
+sbit c_SPI_CLK = P1^5;
 
 void wait(uchar ucDelayCount)
 {
@@ -283,14 +283,14 @@ void VsSineTest(void)
 	MP3_XDCS = 1;
  }
 
-void test_1003_PlayMP3File();
+void VS1003_PlayFile(unsigned char *dat, unsigned int len);
 
 void TestVS1003B(void)
 {
 	Mp3Reset();
 	VsSineTest();
 	Mp3SoftReset();
-	test_1003_PlayMP3File();
+//	VS1003_PlayFile(MusicData, sizeof(MusicData));
 }
 //写数据，音乐数据
 void VS1003B_WriteDAT(unsigned char dat)
@@ -322,31 +322,29 @@ void VS1003B_Fill2048Zero()
 }
 
 
-void test_1003_PlayMP3File() 
+void VS1003_PlayFile(unsigned char *dat, unsigned int len) 
 {
-    unsigned int data_pointer;
+    unsigned int data_pointer = 0;
 	unsigned char i;
-	unsigned int uiCount;
-	uiCount = sizeof(MusicData);
-	data_pointer=0; 
-	Mp3SoftReset();
-    while(uiCount>0)
+	
+	Mp3Reset();
+    while(len > 0)
   	{ 
 	   if(MP3_DREQ)
       	{
     		for(i=0;i<32;i++)
            	{
-     			VS1003B_WriteDAT(MusicData[data_pointer]);
+     			VS1003B_WriteDAT(dat[data_pointer]);
      			data_pointer++;
             }
-			uiCount -= 32;
+			len -= 32;
          }
     }
 	VS1003B_Fill2048Zero();
 }
 sbit P10 = P1 ^ 0;
 sbit P11 = P1 ^ 1;
-xdata unsigned char db[1000] = {0};
+xdata unsigned char db[550] = {0};
 sbit P37 = P3 ^ 7;
 void VS1003BRecord()
 {

@@ -28,18 +28,18 @@
 #include<UART.h>
 
 #ifndef UART_BUFF_MAX
-#define UART_BUFF_MAX 64
+#define UART_BUFF_MAX 1100
 #endif // 如果没有定义BUFFMAX，则默认为64
 
 #ifndef XTAL
-#define XTAL 11.059200
+#define XTAL 22.118400
 #endif //如果没有定义晶振频率，则默认为11.0592M晶振
 sfr AUXR = 0x8E;
-extern void UART_Action(unsigned char *dat, unsigned char len);
+extern void UART_Action(unsigned char *dat, unsigned int len);
 //此函数须另行编写：当串口完成一个字符串结束后会自动调用
 
 unsigned char xdata UART_Buff[UART_BUFF_MAX];     //串口接收缓冲区
-unsigned char UART_BuffIndex = 0;           //串口接收缓冲区当前位置
+unsigned int UART_BuffIndex = 0;           //串口接收缓冲区当前位置
 
 bit UART_SendFlag;                          //串口发送完成标志
 bit UART_ResiveFlag;                        //串口接收完成标志
@@ -111,9 +111,9 @@ void UART_SendString(unsigned char *dat, unsigned int len)
 *作者：何相龙
 *日期：2014年12月9日
 *////////////////////////////////////////////////////////////////////////////////////
-unsigned char UART_Read(unsigned char *to, unsigned char len)
+unsigned char UART_Read(unsigned char *to, unsigned int len)
 {
-	unsigned char i;
+	unsigned int i;
 	if(UART_BuffIndex < len)len = UART_BuffIndex;   //获取当前接收数据的位数
 	for(i = 0;i < len;i ++)                         //复制数据的目标数组
 		{
@@ -136,8 +136,8 @@ unsigned char UART_Read(unsigned char *to, unsigned char len)
 *////////////////////////////////////////////////////////////////////////////////////
 void UART_Driver()
 {
-	unsigned char pdata dat[UART_BUFF_MAX];       //定义数据暂存数组
-	unsigned char len;                      //数据的长度
+	unsigned char dat[UART_BUFF_MAX];       //定义数据暂存数组
+	unsigned int len;                      //数据的长度
 	if(UART_ResiveStringEndFlag)            //如果串口接收到一个完整的字符串
 		{
 			UART_ResiveStringEndFlag = 0;   //清空接收完成标志
@@ -160,7 +160,7 @@ void UART_Driver()
 void UART_RxMonitor(unsigned char ms)
 {
 	static unsigned char ms30 = 0;                  //30毫秒计时
-	static unsigned char UART_BuffIndex_Backup;     //串口数据暂存数组位置备份
+	static unsigned int UART_BuffIndex_Backup;     //串口数据暂存数组位置备份
 	if(! UART_ResiveStringFlag)return ;             //如果当前没有在接受数据，直接退出函数
     ms30 += ms;                                     //每一次定时器中断，表示时间过去了若干毫秒
 	if(UART_BuffIndex_Backup != UART_BuffIndex)     //如果串口数据暂存数组位置备份不等于串口接收缓冲区当前位置（接收到了新数据位）
