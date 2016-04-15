@@ -24,14 +24,13 @@
         使用该模块，请在config.h中定义XTAL常量为晶振频率（单位：兆赫兹）。
             如 #define XTAL 11.059200
 *////////////////////////////////////////////////////////////////////////////////////////
-#include<reg51.h>
-#include<UART.h>
+#include "stc15.h"
+#include "UART.h"
 
 #define UART_BUFF_MAX 320
 
 #define XTAL 22.118400
 
-sfr AUXR = 0x8E;
 extern void UART_Action(unsigned char *dat, unsigned int len);
 //此函数须另行编写：当串口完成一个字符串结束后会自动调用
 

@@ -4,14 +4,6 @@
 
 #include <intrins.h>
 
-#define uchar unsigned char
-#define uint unsigned int
-#define ulong unsigned long
-#define bool bit
-#define true 1
-#define flase 0
-
-#define uint8 unsigned char
 
 sbit  MP3_XRESET  = P3^2;
 sbit MP3_XCS = P3^3;
@@ -21,20 +13,20 @@ sbit c_SPI_SI = P1^3;
 sbit c_SPI_SO = P1^4;
 sbit c_SPI_CLK = P1^5;
 
-void wait(uchar ucDelayCount)
+void wait(unsigned int ms)		//@22.1184MHz
 {
-	uchar ucTempCount;
-	uchar uci;
-
-	for(ucTempCount=0; ucTempCount<ucDelayCount; ucTempCount++)
+	unsigned char i, j;
+	while(ms--)
 	{
-		uci = 230;
-		while(uci--)
+		i = 22;
+		j = 128;
+		do
 		{
-			_nop_();
-	   	}
+			while (--j);
+		} while (--i);
 	}
 }
+
 
 /**********************************************************/
 /*  函数名称 :  InitPortVS1003                            */
@@ -42,7 +34,7 @@ void wait(uchar ucDelayCount)
 /*  参数     :  无                                        */
 /*  返回值   :  无                                        */
 /*--------------------------------------------------------*/
-void  InitPortVS1003(void)
+void InitPortVS1003(void)
 {
 	c_SPI_SO = 1;
 	MP3_DREQ = 1;		
@@ -50,72 +42,29 @@ void  InitPortVS1003(void)
 	MP3_XCS = 1;
 	MP3_XDCS = 1;
 }
-/**********************************************************/
-/*  函数名称 :  SPIPutChar                                */
-/*  函数功能 ： 通过SPI发送一个字节的数据                 */
-/*  参数     :  待发送的字节数据                          */
-/*  返回值   :  无                                        */
-/*--------------------------------------------------------*/
-void  SPIPutChar(unsigned char ucSendData)
-{      
-	uchar ucCount;
-	uchar ucMaskCode;
-
-	ucMaskCode = 0x80;
-	for(ucCount=0; ucCount<8; ucCount++)
-	{
-		c_SPI_CLK = 0;
-
-		if(ucMaskCode & ucSendData)
-		{
-			c_SPI_SI = 1;
-		}
-		else
-		{
-			c_SPI_SI = 0;
-		}
-
-		c_SPI_CLK = 1;
-		ucMaskCode >>= 1;
-
-	}
-}
-
-/*******************************************************************************************************************
-** 函数名称: INT8U SPI_RecByte()				Name:	  INT8U SPI_RecByte()
-** 功能描述: 从SPI接口接收一个字节				Function: receive a byte from SPI interface
-** 输　  入: 无									Input:	  NULL
-** 输 　 出: 收到的字节							Output:	  the byte that be received
-********************************************************************************************************************/
-static uchar SPI_RecByte(void)
+//初始化SPI
+void InitSPI()
 {
-	uchar ucReadData = 0;
-	uchar ucCount;
-
-	ucReadData = 0;
-	c_SPI_SI = 1;
-
-	for(ucCount=0; ucCount<8; ucCount++)
-	{
-		ucReadData <<= 1;
-		c_SPI_CLK = 0;	
-		if(c_SPI_SO)
-		{
-			ucReadData |= 0x01;
-		}
-		c_SPI_CLK = 1;
-
-	}
-
-	return(ucReadData);
+    SPDAT = 0;                  
+    SPSTAT = 0xC0;       
+    SPCTL = 0xDD;      
 }
-
-/*************************************************************/
-/*  函数名称 :  Mp3WriteRegister                             */
-/*  函数功能 ： 写vs1003寄存器                               */
-/*  参数     :  寄存器地址，待写数据                         */
-/*  返回值   :  无                                           */
-/*-----------------------------------------------------------*/
+//通过SPI发送一个字节的数据
+void SPIPutChar(unsigned char SendData)
+{      
+	SPDAT = SendData;                
+    while (!(SPSTAT & 0x80));  
+    SPSTAT = 0xC0;
+}
+//从SPI接口接收一个字节	
+unsigned char SPI_RecByte(void)
+{
+	SPDAT = 0xFF;                
+    while (!(SPSTAT & 0x80));  
+    SPSTAT = 0xC0;
+	return SPDAT;
+}
+//函数功能 ： 写vs1003寄存器
 void Mp3WriteRegister(unsigned char addressbyte, unsigned int databyte)
 {
 	unsigned char lowbyte, highbyte;
@@ -139,7 +88,7 @@ void Mp3WriteRegister(unsigned char addressbyte, unsigned int databyte)
 unsigned int Mp3ReadRegister(unsigned char addressbyte)
 {
 	unsigned int resultvalue = 0;
-	uchar ucReadValue;
+	unsigned char ucReadValue;
 
 	MP3_XCS = 1;
 	MP3_XCS = 0;
@@ -190,15 +139,15 @@ void Mp3SoftReset(void)
 void Mp3Reset(void)
 {	
 	MP3_XRESET = 0;// 复位vs1003      
-	wait(200);//延时100ms
+	InitSPI();
+	wait(100);//延时100ms
 	SPIPutChar(0xff);//发送一个字节的无效数据，启动SPI传输
 	MP3_XCS = 1;   
 	MP3_XDCS = 1;    
 	MP3_XRESET =1; 
-	wait(200);            //延时100ms
+	wait(100);            //延时100ms
 	while (MP3_DREQ == 0);//等待DREQ为高
-
-    wait(200);            //延时100ms
+    wait(100);            //延时100ms
     Mp3SoftReset();//vs1003软复位
 }
 /***********************************************************/
@@ -211,12 +160,12 @@ void Mp3Reset(void)
 void VsSineTest(void)
 {
 	MP3_XRESET = 0;  //xReset = 0   复位vs1003
-	wait(200);        //延时100ms        
+	wait(100);        //延时100ms        
 	SPIPutChar(0xff);//发送一个字节的无效数据，启动SPI传输
 	MP3_XCS = 1;
 	MP3_XDCS = 1;     
 	MP3_XRESET =1; 
-	wait(200);	               
+	wait(100);	               
 	Mp3SetVolume(0x1414);  
 
  	Mp3WriteRegister(SPI_MODE,0x0c20);//进入vs1003的测试模式
@@ -311,8 +260,7 @@ void VS1003B_Fill2048Zero()
 		}
 	}
 }
-sbit P10 = P1 ^ 0;
-sbit P11 = P1 ^ 1;
+
 unsigned char temp[32] = {0};
 void VS1003_Play() 
 {
@@ -328,7 +276,6 @@ void VS1003_Play()
 }
 
 xdata unsigned char db[550] = {0};
-sbit P37 = P3 ^ 7;
 void VS1003BRecord()
 {
 	unsigned int wwwww = 0, idx = 0;

@@ -1,8 +1,8 @@
-#include<reg52.h>
+#include "stc15.h"
 unsigned char dat[2048] = {0};
 unsigned int dataIndexIn = 0;
 unsigned int dataIndexOut = 0;
-sbit P11 = P1 ^ 1;
+
 bit QueueIn(unsigned char *p, unsigned int len)
 {
     unsigned int i = 0;	

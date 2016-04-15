@@ -1,4 +1,4 @@
-#include <reg52.h>
+#include "stc15.h"
 #include <intrins.h>
 #include "UART.h"
 #include "queue.h"
@@ -8,8 +8,6 @@
 #define ulong unsigned long
 #define true 1
 #define flase 0
-sfr AUXR = 0x8E;
-sbit P11 = P1 ^ 1;
 
 void InitPortVS1003(void);	
 void TestVS1003B(void);

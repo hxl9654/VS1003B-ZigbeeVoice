@@ -1,5 +1,5 @@
 /* Include processor definition */
-#include <Reg52.H>
+#include "stc15.h"
 
 //vs1003相关宏定义 
 #define VS_WRITE_COMMAND 0x02
