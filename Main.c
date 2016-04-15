@@ -3,8 +3,9 @@
 #include "UART.h"
 #include "queue.h"
 #include "vs1003.h"
-
-void Timer0Init(void);
+sbit INT0 = P3 ^ 2;
+void Timer0_Init();
+void INT0_Init();
 bit PlayStatu = 0;
 bit RecordStatu = 0;
 unsigned char temp[265] = {0};
@@ -35,7 +36,8 @@ void SystemReset()
 {
 	VS1003_Reset();
 	UART_Conf(11520);
-	Timer0Init();
+	Timer0_Init();
+	INT0_Init();
 	VS1003_InitPort();
 	//WatchDogTimerConfig();
 	
@@ -87,6 +89,7 @@ void UART_Action(unsigned char *dat, unsigned int len)
 		//WatchDogTimerFeed();
 		switch(dat[4])
 		{
+			case(0x90): VS1003_Beep(0x44);					break;
 			case(0x91): SystemReset(); 						break;
 			case(0x92): GetSystemStatu(); 					break;
 			case(0x93): SendRecordData(); 					break;
@@ -99,7 +102,7 @@ void UART_Action(unsigned char *dat, unsigned int len)
 	else
 		ErrorResponse();
 }
-void Timer0Init(void)		
+void Timer0_Init(void)		
 {
 	AUXR |= 0x80;		
 	TMOD &= 0xF0;		
@@ -110,18 +113,35 @@ void Timer0Init(void)
 	TF0 = 0;		
 	TR0 = 1;		
 }
-
+void INT0_Init()
+{
+	INT0 = 1;
+	IT0 = 0;
+	EX0 = 1;
+	EA = 1;
+}
 void main()
 {
 	SystemReset();
 	while(1)
 	{				
 		UART_Driver();
-		VS1003_Play();
+		if(PlayStatu)VS1003_Play();
+		else if(RecordStatu)VS1003_Record();
+		else VS1003_Fill2048Zero();
 	}
 }
 void Timer0_Interrupt() interrupt 1
 {
-	//P11 = ~ P11;
 	UART_RxMonitor(100);
+}
+void INT0_Interrupt() interrupt 0
+{
+	if(INT0 == 0)
+		RecordStatu = 0;
+	else 
+	{
+		if(PlayStatu == 0)
+			RecordStatu = 1;
+	}
 }
