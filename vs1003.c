@@ -250,35 +250,31 @@ void VS1003B_Fill2048Zero()
 		if(MP3_DREQ)
 		{
 			MP3_XDCS = 0;
-
 			for(j=0;j<32;j++)
-			{
-
 				VS1003B_WriteDAT(0x00);
-			}
 			MP3_XDCS = 1;
 		}
 	}
 }
 
-unsigned char temp[32] = {0};
+unsigned char VS1003_Play_Temp[32] = {0};
 void VS1003_Play() 
 {
 	unsigned char i = 0;
 	while(MP3_DREQ)
 	{		
 		//P11 = ~ P11;
-		if(QueueOut(temp, 32) == 1)
+		if(PlayQueueOut(VS1003_Play_Temp, 32) == 1)
 			return;
 		for(i = 0; i < 32; i++)
-			VS1003B_WriteDAT(temp[i]);
+			VS1003B_WriteDAT(VS1003_Play_Temp[i]);
 	}
 }
 
-xdata unsigned char db[550] = {0};
+unsigned char db[256] = {0};
 void VS1003BRecord()
 {
-	unsigned int wwwww = 0, idx = 0;
+	unsigned int wwwww = 0, idx = 0, i;
 	Mp3SetVolume(0x1414); /* Recording monitor volume */
 	Mp3WriteRegister(SPI_BASS, 0); /* Bass/treble disabled */
 	Mp3WriteRegister(SPI_CLOCKF, 0x4430); /* 2.0x 12.288MHz */
@@ -302,14 +298,23 @@ void VS1003BRecord()
 			else break;	
 		} /* wait until 512 bytes available */
 		P10 = 1;
-		P11 = 1;		
-		while (idx < 512) {
+		P11 = 1;	
+		
+		for(i = 0; i < 128; i++)
+		{
 			wwwww = Mp3ReadRegister(SPI_HDAT0);
-			db[idx++] = wwwww>>8;
-			db[idx++] = wwwww&0xFF;
+			db[i * 2] = wwwww >> 8;
+			db[i * 2 + 1] = wwwww & 0xFF;			
 		}
-		idx = 0;
-		UART_SendString(db, 512);
+		RecordQueueIn(db, 256);
+		for(i = 0; i < 128; i++)
+		{
+			wwwww = Mp3ReadRegister(SPI_HDAT0);
+			db[i * 2] = wwwww >> 8;
+			db[i * 2 + 1] = wwwww & 0xFF;			
+		}
+		RecordQueueIn(db, 256);
+		
 	}
 	Mp3Reset();
 }

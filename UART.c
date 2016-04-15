@@ -34,7 +34,7 @@
 extern void UART_Action(unsigned char *dat, unsigned int len);
 //此函数须另行编写：当串口完成一个字符串结束后会自动调用
 
-unsigned char xdata UART_Buff[UART_BUFF_MAX];     //串口接收缓冲区
+unsigned char UART_Buff[UART_BUFF_MAX];     //串口接收缓冲区
 unsigned int UART_BuffIndex = 0;           //串口接收缓冲区当前位置
 
 bit UART_SendFlag;                          //串口发送完成标志
@@ -147,27 +147,27 @@ void UART_Driver()
 *参数列表：
 *   ms
 *       参数类型：unsigned char型数据
-*       参数描述：定时器延时时长（单位：ms）
+*       参数描述：定时器延时时长（单位：us）
 *返回值：无
 *版本：1.0
 *作者：何相龙
 *日期：2014年12月9日
 *////////////////////////////////////////////////////////////////////////////////////
-void UART_RxMonitor(unsigned char ms)
+void UART_RxMonitor(unsigned char us)
 {
-	static unsigned char ms10 = 0;                  //10毫秒计时
+	static unsigned char us1000 = 0;                //10毫秒计时
 	static unsigned int UART_BuffIndex_Backup;      //串口数据暂存数组位置备份
 	if(! UART_ResiveStringFlag)return ;             //如果当前没有在接受数据，直接退出函数
-    ms10 += ms;                                     //每一次定时器中断，表示时间过去了若干毫秒
+    us1000 += us / 10;                              //每一次定时器中断，表示时间过去了若干毫秒
 	
 	if(UART_BuffIndex_Backup != UART_BuffIndex)     //如果串口数据暂存数组位置备份不等于串口接收缓冲区当前位置（接收到了新数据位）
 	{
 		UART_BuffIndex_Backup = UART_BuffIndex;     //记录当前的串口接收缓冲区位置
-		ms10 = 0;                                   //复位10毫秒计时
+		us1000 = 0;                                 //复位10毫秒计时
 	}
-	if(ms10 > 10)                                   //10毫秒到了
+	if(us1000 > 100)                                //10毫秒到了
 	{
-		ms10 = 0;                               	//复位10毫秒计时
+		us1000 = 0;                               	//复位10毫秒计时
 		UART_ResiveStringEndFlag = 1;           	//设置串口字符串接收全部完成标志
 		UART_ResiveStringFlag = 0;              	//清空串口字符串正在接收标志
 	}
