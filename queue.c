@@ -32,7 +32,7 @@ bit PlayQueueOut(unsigned char *p, unsigned int len)
     }
 	return 0;
 }
-unsigned char GetPlayQueueStatu()
+unsigned int GetPlayQueueStatu()
 {
 	if(DataPlayIndexIn > DataPlayIndexOut)
 		return DataPlayIndexIn - DataPlayIndexOut;
@@ -72,7 +72,7 @@ bit RecordQueueOut(unsigned char *p, unsigned int len)
     }
 	return 0;
 }
-unsigned char GetRecordQueueStatu()
+unsigned int GetRecordQueueStatu()
 {
 	if(DataRecordIndexIn > DataRecordIndexOut)
 		return DataRecordIndexIn - DataRecordIndexOut;

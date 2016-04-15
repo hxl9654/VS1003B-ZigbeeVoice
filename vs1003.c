@@ -1,10 +1,7 @@
 #include "vs1003.h"
-#include "UART.h"
 #include "queue.h"
-
 #include <intrins.h>
-
-
+#include "UART.h"
 sbit VS1003_XRESET  = P2^4;
 sbit VS1003_XCS = P2^5;
 sbit VS1003_XDCS  = P2^6;
@@ -139,6 +136,7 @@ void VS1003_Reset(void)
 void VS1003_Beep(unsigned char f)
 {
 	VS1003_Reset();  
+	VS1003_SetVolume(0x5050);
  	VS1003_WriteRegister(SCI_MODE,0x0c24);//进入vs1003的测试模式
 	while (VS1003_DREQ == 0);     //等待DREQ为高
  	VS1003_XDCS = 0;      //选择vs1003的数据接口
@@ -153,7 +151,6 @@ void VS1003_Beep(unsigned char f)
 	SPI_SendByte(0x00);
 	SPI_SendByte(0x00);
 	SPI_SendByte(0x00);
-	Delay(250);
 	Delay(250);
 	VS1003_XDCS = 1;//程序执行到这里后应该能从耳机听到一个单一频率的声音
   
@@ -219,11 +216,11 @@ void VS1003_Record()
 	VS1003_SetVolume(0x1414); /* Recording monitor volume */
 	VS1003_WriteRegister(SCI_BASS, 0); /* Bass/treble disabled */
 	VS1003_WriteRegister(SCI_CLOCKF, 0x4430); /* 2.0x 12.288MHz */
-	Delay(100);
+	Delay(50);
 	VS1003_WriteRegister(SCI_AICTRL0, 12); /* Div -> 12=8kHz 8=12kHz 6=16kHz */
-	Delay(100);
+	//Delay(100);
 	VS1003_WriteRegister(SCI_AICTRL1, 0); /* Auto gain */
-	Delay(100);
+	Delay(10);
 	
 	//VS1003_WriteRegister(SCI_MODE, 0x5c04); //linein
 	VS1003_WriteRegister(SCI_MODE, 0x1c04); 	//mic
@@ -235,6 +232,7 @@ void VS1003_Record()
 			if(wwwww < 256)P10 = 0;
 			else if(wwwww >= 896)P11 = 0;
 			else break;	
+			UART_Driver();
 		} /* Delay until 512 bytes available */
 		P10 = 1;
 		P11 = 1;	

@@ -2,8 +2,8 @@
 #define _QUEUE_H_
 bit PlayQueueOut(unsigned char *p, unsigned int len);
 bit PlayQueueIn(unsigned char *p, unsigned int len);
-unsigned char GetPlayQueueStatu();
+unsigned int GetPlayQueueStatu();
 bit RecordQueueOut(unsigned char *p, unsigned int len);
 bit RecordQueueIn(unsigned char *p, unsigned int len);
-unsigned char GetRecordQueueStatu();
+unsigned int GetRecordQueueStatu();
 #endif // _QUEUE_H_

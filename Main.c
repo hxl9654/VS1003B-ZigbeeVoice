@@ -35,7 +35,7 @@ void ReadVoiceData(unsigned char *dat, unsigned int len)
 void SystemReset()
 {
 	VS1003_Reset();
-	UART_Conf(11520);
+	Uart_Init();
 	Timer0_Init();
 	INT0_Init();
 	VS1003_InitPort();
@@ -62,8 +62,8 @@ void GetSystemStatu()
 }
 void ErrorResponse()
 {
-	temp[0] = 'E'; temp[1] = 'R'; temp[2] = 'R'; temp[3] = 'O'; temp[4] = 'R';
-	temp[5] = ' '; temp[6] = ' '; temp[7] = 0x40; temp[8] = 0x30; temp[9] = '\n';
+	temp[0] = 0x96; temp[1] = 0x38; temp[2] = 0x52; temp[3] = 0x74; temp[4] = 0x00;
+	temp[5] = 'E'; temp[6] = 'R'; temp[7] = 'R'; temp[8] = 'O'; temp[9] = 'R';
 	UART_SendString(temp, 10);
 }
 void StartPlay()
@@ -113,6 +113,17 @@ void Timer0_Init(void)
 	TF0 = 0;		
 	TR0 = 1;		
 }
+void Timer1_Init(void)		
+{
+	AUXR &= 0xBF;		
+	TMOD &= 0x0F;		
+	TL1 = 0x00;		
+	TH1 = 0xDC;	
+	ET1 = 1;
+	TF1 = 0;		
+	TR1 = 1;		
+}
+
 void INT0_Init()
 {
 	INT0 = 1;
@@ -131,13 +142,17 @@ void main()
 		else VS1003_Fill2048Zero();
 	}
 }
+void Timer1_Interrupt() interrupt 3
+{
+	UART_Driver();
+}
 void Timer0_Interrupt() interrupt 1
 {
 	UART_RxMonitor(100);
 }
 void INT0_Interrupt() interrupt 0
 {
-	if(INT0 == 0)
+	if(INT0 == 1)
 		RecordStatu = 0;
 	else 
 	{
