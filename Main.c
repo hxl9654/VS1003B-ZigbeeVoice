@@ -2,18 +2,9 @@
 #include <intrins.h>
 #include "UART.h"
 #include "queue.h"
+#include "vs1003.h"
 
-#define uchar unsigned char
-#define uint unsigned int
-#define ulong unsigned long
-#define true 1
-#define flase 0
-
-void InitPortVS1003(void);	
-void TestVS1003B(void);
-void VS1003BRecord();
-void VS1003_Play() ;
-void Mp3Reset();
+void Timer0Init(void);
 bit PlayStatu = 0;
 bit RecordStatu = 0;
 unsigned char temp[265] = {0};
@@ -42,10 +33,10 @@ void ReadVoiceData(unsigned char *dat, unsigned int len)
 }
 void SystemReset()
 {
-	Mp3Reset();
+	VS1003_Reset();
 	UART_Conf(11520);
 	Timer0Init();
-	InitPortVS1003();
+	VS1003_InitPort();
 	//WatchDogTimerConfig();
 	
 	temp[0] = 0x96; temp[1] = 0x38; temp[2] = 0x52; temp[3] = 0x74; temp[4] = 0x11;
@@ -72,6 +63,22 @@ void ErrorResponse()
 	temp[0] = 'E'; temp[1] = 'R'; temp[2] = 'R'; temp[3] = 'O'; temp[4] = 'R';
 	temp[5] = ' '; temp[6] = ' '; temp[7] = 0x40; temp[8] = 0x30; temp[9] = '\n';
 	UART_SendString(temp, 10);
+}
+void StartPlay()
+{
+	temp[0] = 0x96; temp[1] = 0x38; temp[2] = 0x52; temp[3] = 0x74; temp[4] = 0x15;
+	if(RecordStatu == 0)
+		PlayStatu = 1;
+	else
+		temp[4] = 0x1e;
+	UART_SendString(temp, 5);
+}
+void StopPlay()
+{
+	PlayStatu = 0;
+	VS1003_SoftReset();
+	temp[0] = 0x96; temp[1] = 0x38; temp[2] = 0x52; temp[3] = 0x74; temp[4] = 0x16;
+	UART_SendString(temp, 5);
 }
 void UART_Action(unsigned char *dat, unsigned int len)
 {

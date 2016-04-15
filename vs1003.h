@@ -36,17 +36,16 @@
 #define SM_ADPCM_HP     0x2000 
 
 
-#define Mp3SetVolume(leftchannel_rightchannel){Mp3WriteRegister(11,(leftchannel_rightchannel));}//音量设置 
+#define VS1003_SetVolume(leftchannel_rightchannel){VS1003_WriteRegister(11,(leftchannel_rightchannel));}//音量设置 
 		
-		 
-void  MSPI_Init(void);  //SPI初始化
-void  InitPortVS1003(void);//LPC213x与vs1003的接口的初始化
-void  SPIPutChar(unsigned char c);//通过SPI发送一个字节的数据
-void  Mp3SoftReset(void);//vs1003的软件复位	
-void  Mp3Reset(void);//vs1003的硬件复位
-void  VsSineTest(void);//vs1003的正弦测试
-void  Mp3WriteRegister(unsigned char addressbyte,unsigned int databyte);//写vs1003寄存器
-unsigned int Mp3ReadRegister(unsigned char addressbyte);//读vs1003寄存器
+void  VS1003_Record();
+void  VS1003_Play() ;
+void  VS1003_InitPort(void);//LPC213x与vs1003的接口的初始化
+void  VS1003_SoftReset(void);//vs1003的软件复位	
+void  VS1003_Reset(void);//vs1003的硬件复位
+void  VS1003_Beep(unsigned char f);//vs1003的正弦测试
+void  VS1003_WriteRegister(unsigned char addressbyte,unsigned int databyte);//写vs1003寄存器
+unsigned int VS1003_ReadRegister(unsigned char addressbyte);//读vs1003寄存器
 
 
 

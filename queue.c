@@ -1,17 +1,19 @@
 #include "stc15.h"
-unsigned char datPlay[1537] = {0};
-unsigned int dataPlayIndexIn = 0;
-unsigned int dataPlayIndexOut = 0;
+#define DATAPLAYLENTH 1025
+#define DATARECORDLENTH 1025
+unsigned char DataPlay[DATAPLAYLENTH] = {0};
+unsigned int DataPlayIndexIn = 0;
+unsigned int DataPlayIndexOut = 0;
 bit PlayQueueIn(unsigned char *p, unsigned int len)
 {
     unsigned int i = 0;	
     for(i = 0; i < len; i++)
     {
-        datPlay[dataPlayIndexIn] = p[i];
-        dataPlayIndexIn++;
-        if(dataPlayIndexIn == 1537)
-            dataPlayIndexIn = 0;
-        if(dataPlayIndexIn == dataPlayIndexOut)
+        DataPlay[DataPlayIndexIn] = p[i];
+        DataPlayIndexIn++;
+        if(DataPlayIndexIn == DATAPLAYLENTH)
+            DataPlayIndexIn = 0;
+        if(DataPlayIndexIn == DataPlayIndexOut)
             return 1;
     }
 	return 0;
@@ -21,37 +23,37 @@ bit PlayQueueOut(unsigned char *p, unsigned int len)
     unsigned int i = 0;
     for(i = 0; i < len; i++)
     {
-		if(dataPlayIndexIn == dataPlayIndexOut)
+		if(DataPlayIndexIn == DataPlayIndexOut)
             return 1;
-        p[i] = datPlay[dataPlayIndexOut];
-        dataPlayIndexOut++;
-        if(dataPlayIndexOut == 1537)
-            dataPlayIndexOut = 0;        
+        p[i] = DataPlay[DataPlayIndexOut];
+        DataPlayIndexOut++;
+        if(DataPlayIndexOut == DATAPLAYLENTH)
+            DataPlayIndexOut = 0;        
     }
 	return 0;
 }
 unsigned char GetPlayQueueStatu()
 {
-	if(dataIndexIn > dataIndexOut)
-		return dataIndexIn - dataIndexOut;
-	else if(dataIndexIn < dataIndexOut)
-		return dataIndexIn + 1537 - dataIndexOut;
+	if(DataPlayIndexIn > DataPlayIndexOut)
+		return DataPlayIndexIn - DataPlayIndexOut;
+	else if(DataPlayIndexIn < DataPlayIndexOut)
+		return DataPlayIndexIn + DATAPLAYLENTH - DataPlayIndexOut;
 	else return 0;
 	return 0;
 }
-unsigned char datRecord[1025] = {0};
-unsigned int dataRecordIndexIn = 0;
-unsigned int dataRecordIndexOut = 0;
+unsigned char DataRecord[DATARECORDLENTH] = {0};
+unsigned int DataRecordIndexIn = 0;
+unsigned int DataRecordIndexOut = 0;
 bit RecordQueueIn(unsigned char *p, unsigned int len)
 {
     unsigned int i = 0;	
     for(i = 0; i < len; i++)
     {
-        datRecord[dataRecordIndexIn] = p[i];
-        dataRecordIndexIn++;
-        if(dataRecordIndexIn == 1025)
-            dataRecordIndexIn = 0;
-        if(dataRecordIndexIn == dataRecordIndexOut)
+        DataRecord[DataRecordIndexIn] = p[i];
+        DataRecordIndexIn++;
+        if(DataRecordIndexIn == DATARECORDLENTH)
+            DataRecordIndexIn = 0;
+        if(DataRecordIndexIn == DataRecordIndexOut)
             return 1;
     }
 	return 0;
@@ -61,21 +63,21 @@ bit RecordQueueOut(unsigned char *p, unsigned int len)
     unsigned int i = 0;
     for(i = 0; i < len; i++)
     {
-		if(dataRecordIndexIn == dataRecordIndexOut)
+		if(DataRecordIndexIn == DataRecordIndexOut)
             return 1;
-        p[i] = datRecord[dataRecordIndexOut];
-        dataRecordIndexOut++;
-        if(dataRecordIndexOut == 1025)
-            dataRecordIndexOut = 0;        
+        p[i] = DataRecord[DataRecordIndexOut];
+        DataRecordIndexOut++;
+        if(DataRecordIndexOut == DATARECORDLENTH)
+            DataRecordIndexOut = 0;        
     }
 	return 0;
 }
 unsigned char GetRecordQueueStatu()
 {
-	if(dataRecordIndexIn > dataRecordIndexOut)
-		return dataRecordIndexIn - dataRecordIndexOut;
-	else if(dataRecordIndexIn < dataRecordIndexOut)
-		return dataRecordIndexIn + 1025 - dataRecordIndexOut;
+	if(DataRecordIndexIn > DataRecordIndexOut)
+		return DataRecordIndexIn - DataRecordIndexOut;
+	else if(DataRecordIndexIn < DataRecordIndexOut)
+		return DataRecordIndexIn + DATARECORDLENTH - DataRecordIndexOut;
 	else return 0;
 	return 0;
 }
