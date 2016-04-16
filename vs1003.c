@@ -122,12 +122,12 @@ void VS1003_Reset(void)
 {	
 	VS1003_XRESET = 0;// 复位vs1003      
 	SPI_Init();
-	Delay(100);//延时100ms
+	Delay(10);//延时10ms
 	SPI_SendByte(0xff);//发送一个字节的无效数据，启动SPI传输
 	VS1003_XCS = 1;   
 	VS1003_XDCS = 1;    
 	VS1003_XRESET =1; 
-	Delay(100);            //延时100ms
+
 	while (VS1003_DREQ == 0);//等待DREQ为高
     VS1003_SoftReset();//vs1003软复位
 }
@@ -216,11 +216,11 @@ void VS1003_Record()
 	VS1003_SetVolume(0x1414); /* Recording monitor volume */
 	VS1003_WriteRegister(SCI_BASS, 0); /* Bass/treble disabled */
 	VS1003_WriteRegister(SCI_CLOCKF, 0x4430); /* 2.0x 12.288MHz */
-	Delay(50);
+	Delay(5);
 	VS1003_WriteRegister(SCI_AICTRL0, 12); /* Div -> 12=8kHz 8=12kHz 6=16kHz */
 	//Delay(100);
 	VS1003_WriteRegister(SCI_AICTRL1, 0); /* Auto gain */
-	Delay(10);
+	Delay(1);
 	
 	//VS1003_WriteRegister(SCI_MODE, 0x5c04); //linein
 	VS1003_WriteRegister(SCI_MODE, 0x1c04); 	//mic
@@ -232,11 +232,12 @@ void VS1003_Record()
 			if(wwwww < 256)P10 = 0;
 			else if(wwwww >= 896)P11 = 0;
 			else break;	
+			//if(!RecordStatu)return ;
 			UART_Driver();
 		} /* Delay until 512 bytes available */
 		P10 = 1;
 		P11 = 1;	
-		
+		ET1 = 0;
 		for(i = 0; i < 128; i++)
 		{
 			wwwww = VS1003_ReadRegister(SCI_HDAT0);
@@ -251,7 +252,7 @@ void VS1003_Record()
 			db[i * 2 + 1] = wwwww & 0xFF;			
 		}
 		RecordQueueIn(db, 256);
-		
+		ET1 = 1;
 	}
 	VS1003_Reset();
 }

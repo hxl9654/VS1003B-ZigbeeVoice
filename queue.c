@@ -41,6 +41,11 @@ unsigned int GetPlayQueueStatu()
 	else return 0;
 	return 0;
 }
+void PlayQueueReset()
+{
+	DataPlayIndexIn = 0;
+	DataPlayIndexOut = 0;
+}
 unsigned char DataRecord[DATARECORDLENTH] = {0};
 unsigned int DataRecordIndexIn = 0;
 unsigned int DataRecordIndexOut = 0;
@@ -80,4 +85,14 @@ unsigned int GetRecordQueueStatu()
 		return DataRecordIndexIn + DATARECORDLENTH - DataRecordIndexOut;
 	else return 0;
 	return 0;
+}
+void RecordQueueReset()
+{
+	DataRecordIndexIn = 0;
+	DataRecordIndexOut = 0;
+}
+void QueueReset()
+{
+	RecordQueueReset();
+	PlayQueueReset();
 }

@@ -129,13 +129,15 @@ unsigned int UART_Read(unsigned char *to, unsigned int len)
 void UART_Driver()
 {
 	unsigned char dat[UART_BUFF_MAX];       //定义数据暂存数组
-	unsigned int len;                      //数据的长度
+	unsigned int len;                      	//数据的长度
+	ET1 = 0;
 	if(UART_ResiveStringEndFlag)            //如果串口接收到一个完整的字符串
-		{
-			UART_ResiveStringEndFlag = 0;   //清空接收完成标志
-			len = UART_Read(dat, UART_BUFF_MAX);  //将数据从原数组读出，并得到数据的长度
-			UART_Action(dat, len);          //调用用户编写的UART_Action函数，将接收到的数据及数据长度作为参数
-		}
+	{
+		UART_ResiveStringEndFlag = 0;   	//清空接收完成标志
+		len = UART_Read(dat, UART_BUFF_MAX);  //将数据从原数组读出，并得到数据的长度
+		UART_Action(dat, len);          	//调用用户编写的UART_Action函数，将接收到的数据及数据长度作为参数
+	}
+	ET1 = 1;
 }
 /*///////////////////////////////////////////////////////////////////////////////////
 *函数名：UART_RxMonitor

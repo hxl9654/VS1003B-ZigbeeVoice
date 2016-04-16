@@ -5,7 +5,9 @@
 #include "vs1003.h"
 sbit INT0 = P3 ^ 2;
 void Timer0_Init();
+void Timer1_Init();
 void INT0_Init();
+void Interrupt_Init();
 bit PlayStatu = 0;
 bit RecordStatu = 0;
 unsigned char temp[265] = {0};
@@ -20,7 +22,10 @@ void SendRecordData()
 	{
 		temp[4] = 0x1c;
 		UART_SendString(temp, 5);
+		return;
 	}
+	RecordQueueOut(temp, 256);
+	UART_SendString(temp, 256);
 }
 void ReadVoiceData(unsigned char *dat, unsigned int len)
 {
@@ -37,8 +42,12 @@ void SystemReset()
 	VS1003_Reset();
 	Uart_Init();
 	Timer0_Init();
+	Timer1_Init();
 	INT0_Init();
+	Interrupt_Init();
 	VS1003_InitPort();
+	QueueReset();
+	
 	//WatchDogTimerConfig();
 	
 	temp[0] = 0x96; temp[1] = 0x38; temp[2] = 0x52; temp[3] = 0x74; temp[4] = 0x11;
@@ -102,12 +111,17 @@ void UART_Action(unsigned char *dat, unsigned int len)
 	else
 		ErrorResponse();
 }
+void Interrupt_Init()
+{
+	PS = 1;
+	PX0 = 1;
+	EA = 1;
+}
 void Timer0_Init(void)		
 {
 	AUXR |= 0x80;		
 	TMOD &= 0xF0;		
-	ET0 = 1;	
-	EA = 1;
+	ET0 = 1;		
 	TL0 = 0x5C;		
 	TH0 = 0xF7;		
 	TF0 = 0;		
@@ -118,7 +132,7 @@ void Timer1_Init(void)
 	AUXR &= 0xBF;		
 	TMOD &= 0x0F;		
 	TL1 = 0x00;		
-	TH1 = 0xDC;	
+	TH1 = 0x00;	
 	ET1 = 1;
 	TF1 = 0;		
 	TR1 = 1;		
@@ -129,7 +143,6 @@ void INT0_Init()
 	INT0 = 1;
 	IT0 = 0;
 	EX0 = 1;
-	EA = 1;
 }
 void main()
 {
