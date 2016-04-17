@@ -136,7 +136,7 @@ void VS1003_Reset(void)
 void VS1003_Beep(unsigned char f)
 {
 	VS1003_Reset();  
-	VS1003_SetVolume(0x5050);
+	VS1003_SetVolume(0x2020);
  	VS1003_WriteRegister(SCI_MODE,0x0c24);//进入vs1003的测试模式
 	while (VS1003_DREQ == 0);     //等待DREQ为高
  	VS1003_XDCS = 0;      //选择vs1003的数据接口
