@@ -51,15 +51,7 @@ void Response()
 		Send_Temp[7] = 0x02;
 	else
 		Send_Temp[7] = 0x00;
-	if((RecordStatu || RecordStatuStop) && RecordQueueStatu >= 512)
-	{
-		Send_Temp[8] = 0x01;
-		UARTQueue_Out(Send_Temp + 9, 256);
-		UART_SendString(Send_Temp, 265);
-		UARTQueue_Out(Send_Temp + 9, 256);
-		UART_SendString(Send_Temp, 265);
-	}
-	else if((RecordStatu || RecordStatuStop) && RecordQueueStatu >= 256)
+	if((RecordStatu || RecordStatuStop) && RecordQueueStatu >= 256)
 	{
 		Send_Temp[8] = 0x01;
 		RecordQueue_Out(Send_Temp + 9, 256);
@@ -70,6 +62,7 @@ void Response()
 		Send_Temp[8] = 0x00;
 		UART_SendString(Send_Temp, 9);
 	}	
+	RecordStatuStop = 0;
 }
 void UART_Action(unsigned char dat, unsigned char len)
 {
@@ -102,9 +95,14 @@ void main()
 }
 void Timer1_Interrupt() interrupt 3
 {
-	UART_Driver();
+	UART_Driver();	
+}
+void Timer0_Interrupt() interrupt 1
+{
+	TR0 = 0;
 	if(RecordStatu || RecordStatuStop)
 		Response();
+	TR0 = 1;
 }
 void INT0_Interrupt() interrupt 0
 {

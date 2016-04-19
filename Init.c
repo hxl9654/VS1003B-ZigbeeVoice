@@ -20,6 +20,16 @@ void Timer1_Init(void)
 	TF1 = 0;		
 	TR1 = 1;		
 }
+void Timer0_Init(void)		
+{
+	AUXR &= 0x7F;		
+	TMOD &= 0xF0;		
+	TL0 = 0x00;		
+	TH0 = 0x00;	
+	ET0 = 1;	
+	TF0 = 0;		
+	TR0 = 1;		
+}
 
 void INT0_Init()
 {
@@ -37,6 +47,7 @@ void SystemInit()
 {
 	VS1003_Reset();
 	Uart_Init();
+	Timer0_Init();
 	Timer1_Init();
 	INT0_Init();
 	Interrupt_Init();

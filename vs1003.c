@@ -211,7 +211,7 @@ void VS1003_Play()
 }
 //通过vs1003采集声音
 extern bit RecordStatu;
-idata unsigned char db[130] = {0};
+unsigned char db[256] = {0};
 void VS1003_Record()
 {
 	unsigned int wwwww = 0, idx = 0, i, j;
@@ -240,15 +240,15 @@ void VS1003_Record()
 		P10 = 1;
 		P11 = 1;	
 		ET1 = 0;
-		for(j = 0; j < 4; j++)
+		for(j = 0; j < 2; j++)
 		{
-			for(i = 0; i < 64; i++)
+			for(i = 0; i < 128; i++)
 			{
 				wwwww = VS1003_ReadRegister(SCI_HDAT0);
 				db[i * 2] = wwwww >> 8;
 				db[i * 2 + 1] = wwwww & 0xFF;			
 			}
-			RecordQueue_In(db, 128);
+			RecordQueue_In(db, 256);
 		}
 		ET1 = 1;
 	}

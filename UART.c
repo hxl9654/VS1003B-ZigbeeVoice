@@ -71,7 +71,6 @@ void UART_Driver()
 	unsigned int len_buff;                      	//缓冲区中数据的长度
 	data unsigned char temp[5] = {0};
 	ET1 = 0;
-	P34=0;
 	len_buff = UARTQueue_GetStatu();  		//得到已缓存数据的长度
 	if(UART_PendingDataFlag)
 	{
@@ -82,7 +81,7 @@ void UART_Driver()
 			UART_PendingDataFlag = 0;
 			len_buff = UARTQueue_GetStatu();
 		}
-		else {P34=1;ET1 = 1;return;}
+		else {ET1 = 1;return;}
 	}
 	if(len_buff >= 7)
 	{
@@ -96,13 +95,13 @@ void UART_Driver()
 				if(UART_Temp[1] == 0x01 && UARTQueue_GetStatu() < 256)
 				{
 					UART_PendingDataFlag = 1;
-					P34=1; ET1 = 1;
+					ET1 = 1;
 					return ;
 				}					
 				UART_Action(UART_Temp[0], UART_Temp[1]);    //调用UART_Action函数，将接收到的数据及数据长度作为参数
 			}
 		}		
-	}P34=1;
+	}
 	ET1 = 1;
 }
 /*///////////////////////////////////////////////////////////////////////////////////
