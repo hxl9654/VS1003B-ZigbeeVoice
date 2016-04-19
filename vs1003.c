@@ -43,7 +43,7 @@ void SPI_Init()
 {
     SPDAT = 0;                  
     SPSTAT = 0xC0;       
-    SPCTL = 0xDD;      
+    SPCTL = 0xDE;      
 }
 //通过SPI发送一个字节的数据
 void SPI_SendByte(unsigned char SendData)
@@ -194,13 +194,15 @@ void VS1003_Fill2048Zero()
 	}
 }
 
-unsigned char VS1003_Play_Temp[32] = {0};
+data unsigned char VS1003_Play_Temp[32] = {0};
 void VS1003_Play() 
 {
 	unsigned char i = 0;
 	while(VS1003_DREQ)
 	{		
 		//P11 = ~ P11;
+		if(PlayQueue_GetStatu() < 32)
+			return;
 		if(PlayQueue_Out(VS1003_Play_Temp, 32) == 1)
 			return;
 		for(i = 0; i < 32; i++)

@@ -15,7 +15,7 @@ void Timer1_Init(void)
 	AUXR &= 0xBF;		
 	TMOD &= 0x0F;		
 	TL1 = 0x00;		
-	TH1 = 0x00;	
+	TH1 = 0xCA;		
 	ET1 = 1;
 	TF1 = 0;		
 	TR1 = 1;		

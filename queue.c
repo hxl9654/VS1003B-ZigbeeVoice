@@ -138,6 +138,40 @@ void UARTQueue_Reset()
 	UARTQueue_Data_IndexIn = 0;
 	UARTQueue_Data_IndexOut = 0;
 }
+bit UARTQueue_TO_PlayQueue(unsigned int len)
+{
+	unsigned int i;
+	if(UARTQueue_GetStatu() < len || PLAYQUEUEDATALENTH - PlayQueue_GetStatu() < len)
+		return 1;
+	for(i = 0; i < len; i++)
+	{
+		PlayQueue_Data[PlayQueue_Data_IndexIn] = UARTQueue_Data[UARTQueue_Data_IndexOut];
+		PlayQueue_Data_IndexIn++;
+		if(PlayQueue_Data_IndexIn >= PLAYQUEUEDATALENTH)
+			PlayQueue_Data_IndexIn = 0;
+		UARTQueue_Data_IndexOut++;
+		if(UARTQueue_Data_IndexOut >= UARTQUEUEDATALENTH)
+			UARTQueue_Data_IndexOut = 0;
+	}
+	return 0;
+}
+bit RecordQueue_TO_UARTQueue(unsigned int len)
+{
+	unsigned int i;
+	if(RecordQueue_GetStatu() < len || UARTQUEUEDATALENTH - UARTQueue_GetStatu() < len)
+		return 1;
+	for(i = 0; i < len; i++)
+	{
+		UARTQueue_Data[UARTQueue_Data_IndexIn] = RecordQueue_Data[RecordQueue_Data_IndexOut];
+		UARTQueue_Data_IndexIn++;
+		if(UARTQueue_Data_IndexIn >= UARTQUEUEDATALENTH)
+			UARTQueue_Data_IndexIn = 0;
+		RecordQueue_Data_IndexOut++;
+		if(RecordQueue_Data_IndexOut >= RECORDQUEUEDATALENTH)
+			RecordQueue_Data_IndexOut = 0;
+	}
+	return 0;
+}
 void Queue_Reset()
 {
 	UARTQueue_Reset();

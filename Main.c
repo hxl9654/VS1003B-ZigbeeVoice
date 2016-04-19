@@ -14,7 +14,7 @@ const unsigned char header[64] = {
 0x57, 0x41, 0x56, 0x45, 0x66, 0x6d, 0x74, 0x20, /*|RIFF....WAVEfmt |*/
 0x12, 0x00, 0x00, 0x00, 0x01, 0x00, 0x01, 0x00,
 //0x40, 0x1f, 0x00, 0x00, 0x80, 0x3e, 0x00, 0x00, /*|........@...OE...|*/
-0xa0, 0x0f, 0x00, 0x00, 0xa0, 0x0f, 0x00, 0x00, /*|........@...OE...|*/	
+0x70, 0x17, 0x00, 0x00, 0x70, 0x17, 0x00, 0x00, /*|........@...OE...|*/	
 //0x02, 0x00, 0x10, 0x00, 0x00, 0x00, 0x64, 0x61,
 0x01, 0x00, 0x08, 0x00, 0x00, 0x00, 0x64, 0x61,
 0x74, 0x61, 0xff, 0xff, 0xff, 0xff
@@ -71,26 +71,23 @@ void Response()
 		UART_SendString(Send_Temp, 9);
 	}	
 }
-void UART_Action(unsigned char *dat, unsigned int len)
+void UART_Action(unsigned char dat, unsigned char len)
 {
-	if(dat[0] == 0x14 && dat[1] == 0x72 && dat[2] == 0x58 && dat[3] == 0x36 && dat[4] == 0x90)
+	//WatchDogTimerFeed();
+	switch(dat)
 	{
-		//WatchDogTimerFeed();
-		switch(dat[5])
-		{
-			case(0x00): if(PlayStatu) {PlayStatu = 0; PlayQueue_Reset();}			break;
-			case(0x01): if(!PlayStatu){PlayStatu = 1; PlayQueue_In(header, 64);}	break;
-			case(0x02): if(!PlayStatu){PlayStatu = 1; PlayQueue_In(header, 64);}	break;
-			case(0x03): PlayStatu = 0; PlayQueue_Reset();							break;
-			case(0x10): 				 											break;
-			case(0x99): SystemReset();												break;
-			default: 																break;	
-		}
-		if(dat[6] != 0x00)
-			PlayQueue_In(dat + 7, len - 7);
-		if(!RecordStatu)
-			Response();
+		case(0x00): if(PlayStatu) {PlayStatu = 0; PlayQueue_Reset();}			break;
+		case(0x01): if(!PlayStatu){PlayStatu = 1; PlayQueue_In(header, 64);}	break;
+		case(0x02): if(!PlayStatu){PlayStatu = 1; PlayQueue_In(header, 64);}	break;
+		case(0x03): PlayStatu = 0; PlayQueue_Reset();							break;
+		case(0x10): 				 											break;
+		case(0x99): SystemReset();												break;
+		default: 																break;	
 	}
+	if(len != 0x00)
+		UARTQueue_TO_PlayQueue(256);
+	if(!RecordStatu)
+		Response();
 }
 void main()
 {
@@ -117,7 +114,7 @@ void INT0_Interrupt() interrupt 0
 		RecordStatu = 0;
 		RecordStatuStop = 1;
 	}
-	else if(RecordStatu == 0)
+	else if(INT0 == 0 && RecordStatu == 0)
 	{
 		if(PlayStatu == 0)
 		{
