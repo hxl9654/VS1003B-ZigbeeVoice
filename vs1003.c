@@ -201,7 +201,7 @@ void VS1003_Play()
 	while(VS1003_DREQ)
 	{		
 		//P11 = ~ P11;
-		if(PlayQueueOut(VS1003_Play_Temp, 32) == 1)
+		if(PlayQueue_Out(VS1003_Play_Temp, 32) == 1)
 			return;
 		for(i = 0; i < 32; i++)
 			VS1003_WriteDAT(VS1003_Play_Temp[i]);
@@ -209,10 +209,10 @@ void VS1003_Play()
 }
 //通过vs1003采集声音
 extern bit RecordStatu;
-unsigned char db[256] = {0};
+idata unsigned char db[130] = {0};
 void VS1003_Record()
 {
-	unsigned int wwwww = 0, idx = 0, i;
+	unsigned int wwwww = 0, idx = 0, i, j;
 	VS1003_SetVolume(0x1414); /* Recording monitor volume */
 	VS1003_WriteRegister(SCI_BASS, 0); /* Bass/treble disabled */
 	VS1003_WriteRegister(SCI_CLOCKF, 0x4430); /* 2.0x 12.288MHz */
@@ -238,20 +238,16 @@ void VS1003_Record()
 		P10 = 1;
 		P11 = 1;	
 		ET1 = 0;
-		for(i = 0; i < 128; i++)
+		for(j = 0; j < 4; j++)
 		{
-			wwwww = VS1003_ReadRegister(SCI_HDAT0);
-			db[i * 2] = wwwww >> 8;
-			db[i * 2 + 1] = wwwww & 0xFF;			
+			for(i = 0; i < 64; i++)
+			{
+				wwwww = VS1003_ReadRegister(SCI_HDAT0);
+				db[i * 2] = wwwww >> 8;
+				db[i * 2 + 1] = wwwww & 0xFF;			
+			}
+			RecordQueue_In(db, 128);
 		}
-		RecordQueueIn(db, 256);
-		for(i = 0; i < 128; i++)
-		{
-			wwwww = VS1003_ReadRegister(SCI_HDAT0);
-			db[i * 2] = wwwww >> 8;
-			db[i * 2 + 1] = wwwww & 0xFF;			
-		}
-		RecordQueueIn(db, 256);
 		ET1 = 1;
 	}
 	VS1003_Reset();

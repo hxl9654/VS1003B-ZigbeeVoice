@@ -1,98 +1,146 @@
 #include "stc15.h"
-#define DATAPLAYLENTH 1025
-#define DATARECORDLENTH 1025
-unsigned char DataPlay[DATAPLAYLENTH] = {0};
-unsigned int DataPlayIndexIn = 0;
-unsigned int DataPlayIndexOut = 0;
-bit PlayQueueIn(unsigned char *p, unsigned int len)
+#define PLAYQUEUEDATALENTH 1025
+#define RECORDQUEUEDATALENTH 1025
+#define UARTQUEUEDATALENTH 1025
+
+unsigned char PlayQueue_Data[PLAYQUEUEDATALENTH] = {0};
+unsigned int PlayQueue_Data_IndexIn = 0;
+unsigned int PlayQueue_Data_IndexOut = 0;
+bit PlayQueue_In(unsigned char *p, unsigned int len)
 {
     unsigned int i = 0;	
     for(i = 0; i < len; i++)
     {
-        DataPlay[DataPlayIndexIn] = p[i];
-        DataPlayIndexIn++;
-        if(DataPlayIndexIn == DATAPLAYLENTH)
-            DataPlayIndexIn = 0;
-        if(DataPlayIndexIn == DataPlayIndexOut)
+        PlayQueue_Data[PlayQueue_Data_IndexIn] = p[i];
+        PlayQueue_Data_IndexIn++;
+        if(PlayQueue_Data_IndexIn == PLAYQUEUEDATALENTH)
+            PlayQueue_Data_IndexIn = 0;
+        if(PlayQueue_Data_IndexIn == PlayQueue_Data_IndexOut)
             return 1;
     }
 	return 0;
 }
-bit PlayQueueOut(unsigned char *p, unsigned int len)
+bit PlayQueue_Out(unsigned char *p, unsigned int len)
 {
     unsigned int i = 0;
     for(i = 0; i < len; i++)
     {
-		if(DataPlayIndexIn == DataPlayIndexOut)
+		if(PlayQueue_Data_IndexIn == PlayQueue_Data_IndexOut)
             return 1;
-        p[i] = DataPlay[DataPlayIndexOut];
-        DataPlayIndexOut++;
-        if(DataPlayIndexOut == DATAPLAYLENTH)
-            DataPlayIndexOut = 0;        
+        p[i] = PlayQueue_Data[PlayQueue_Data_IndexOut];
+        PlayQueue_Data_IndexOut++;
+        if(PlayQueue_Data_IndexOut == PLAYQUEUEDATALENTH)
+            PlayQueue_Data_IndexOut = 0;        
     }
 	return 0;
 }
-unsigned int GetPlayQueueStatu()
+unsigned int PlayQueue_GetStatu()
 {
-	if(DataPlayIndexIn > DataPlayIndexOut)
-		return DataPlayIndexIn - DataPlayIndexOut;
-	else if(DataPlayIndexIn < DataPlayIndexOut)
-		return DataPlayIndexIn + DATAPLAYLENTH - DataPlayIndexOut;
+	if(PlayQueue_Data_IndexIn > PlayQueue_Data_IndexOut)
+		return PlayQueue_Data_IndexIn - PlayQueue_Data_IndexOut;
+	else if(PlayQueue_Data_IndexIn < PlayQueue_Data_IndexOut)
+		return PlayQueue_Data_IndexIn + PLAYQUEUEDATALENTH - PlayQueue_Data_IndexOut;
 	else return 0;
 	return 0;
 }
-void PlayQueueReset()
+void PlayQueue_Reset()
 {
-	DataPlayIndexIn = 0;
-	DataPlayIndexOut = 0;
+	PlayQueue_Data_IndexIn = 0;
+	PlayQueue_Data_IndexOut = 0;
 }
-unsigned char DataRecord[DATARECORDLENTH] = {0};
-unsigned int DataRecordIndexIn = 0;
-unsigned int DataRecordIndexOut = 0;
-bit RecordQueueIn(unsigned char *p, unsigned int len)
+unsigned char RecordQueue_Data[RECORDQUEUEDATALENTH] = {0};
+unsigned int RecordQueue_Data_IndexIn = 0;
+unsigned int RecordQueue_Data_IndexOut = 0;
+bit RecordQueue_In(unsigned char *p, unsigned int len)
 {
     unsigned int i = 0;	
     for(i = 0; i < len; i++)
     {
-        DataRecord[DataRecordIndexIn] = p[i];
-        DataRecordIndexIn++;
-        if(DataRecordIndexIn == DATARECORDLENTH)
-            DataRecordIndexIn = 0;
-        if(DataRecordIndexIn == DataRecordIndexOut)
+        RecordQueue_Data[RecordQueue_Data_IndexIn] = p[i];
+        RecordQueue_Data_IndexIn++;
+        if(RecordQueue_Data_IndexIn == RECORDQUEUEDATALENTH)
+            RecordQueue_Data_IndexIn = 0;
+        if(RecordQueue_Data_IndexIn == RecordQueue_Data_IndexOut)
             return 1;
     }
 	return 0;
 }
-bit RecordQueueOut(unsigned char *p, unsigned int len)
+bit RecordQueue_Out(unsigned char *p, unsigned int len)
 {
     unsigned int i = 0;
     for(i = 0; i < len; i++)
     {
-		if(DataRecordIndexIn == DataRecordIndexOut)
+		if(RecordQueue_Data_IndexIn == RecordQueue_Data_IndexOut)
             return 1;
-        p[i] = DataRecord[DataRecordIndexOut];
-        DataRecordIndexOut++;
-        if(DataRecordIndexOut == DATARECORDLENTH)
-            DataRecordIndexOut = 0;        
+        p[i] = RecordQueue_Data[RecordQueue_Data_IndexOut];
+        RecordQueue_Data_IndexOut++;
+        if(RecordQueue_Data_IndexOut == RECORDQUEUEDATALENTH)
+            RecordQueue_Data_IndexOut = 0;        
     }
 	return 0;
 }
-unsigned int GetRecordQueueStatu()
+unsigned int RecordQueue_GetStatu()
 {
-	if(DataRecordIndexIn > DataRecordIndexOut)
-		return DataRecordIndexIn - DataRecordIndexOut;
-	else if(DataRecordIndexIn < DataRecordIndexOut)
-		return DataRecordIndexIn + DATARECORDLENTH - DataRecordIndexOut;
+	if(RecordQueue_Data_IndexIn > RecordQueue_Data_IndexOut)
+		return RecordQueue_Data_IndexIn - RecordQueue_Data_IndexOut;
+	else if(RecordQueue_Data_IndexIn < RecordQueue_Data_IndexOut)
+		return RecordQueue_Data_IndexIn + RECORDQUEUEDATALENTH - RecordQueue_Data_IndexOut;
 	else return 0;
 	return 0;
 }
-void RecordQueueReset()
+void RecordQueue_Reset()
 {
-	DataRecordIndexIn = 0;
-	DataRecordIndexOut = 0;
+	RecordQueue_Data_IndexIn = 0;
+	RecordQueue_Data_IndexOut = 0;
 }
-void QueueReset()
+unsigned char UARTQueue_Data[UARTQUEUEDATALENTH] = {0};
+unsigned int UARTQueue_Data_IndexIn = 0;
+unsigned int UARTQueue_Data_IndexOut = 0;
+bit UARTQueue_In(unsigned char *p, unsigned int len)
 {
-	RecordQueueReset();
-	PlayQueueReset();
+    unsigned int i = 0;	
+    for(i = 0; i < len; i++)
+    {
+        UARTQueue_Data[UARTQueue_Data_IndexIn] = p[i];
+        UARTQueue_Data_IndexIn++;
+        if(UARTQueue_Data_IndexIn == UARTQUEUEDATALENTH)
+            UARTQueue_Data_IndexIn = 0;
+        if(UARTQueue_Data_IndexIn == UARTQueue_Data_IndexOut)
+            return 1;
+    }
+	return 0;
+}
+bit UARTQueue_Out(unsigned char *p, unsigned int len)
+{
+    unsigned int i = 0;
+    for(i = 0; i < len; i++)
+    {
+		if(UARTQueue_Data_IndexIn == UARTQueue_Data_IndexOut)
+            return 1;
+        p[i] = UARTQueue_Data[UARTQueue_Data_IndexOut];
+        UARTQueue_Data_IndexOut++;
+        if(UARTQueue_Data_IndexOut == UARTQUEUEDATALENTH)
+            UARTQueue_Data_IndexOut = 0;        
+    }
+	return 0;
+}
+unsigned int UARTQueue_GetStatu()
+{
+	if(UARTQueue_Data_IndexIn > UARTQueue_Data_IndexOut)
+		return UARTQueue_Data_IndexIn - UARTQueue_Data_IndexOut;
+	else if(UARTQueue_Data_IndexIn < UARTQueue_Data_IndexOut)
+		return UARTQueue_Data_IndexIn + UARTQUEUEDATALENTH - UARTQueue_Data_IndexOut;
+	else return 0;
+	return 0;
+}
+void UARTQueue_Reset()
+{
+	UARTQueue_Data_IndexIn = 0;
+	UARTQueue_Data_IndexOut = 0;
+}
+void Queue_Reset()
+{
+	UARTQueue_Reset();
+	PlayQueue_Reset();
+	RecordQueue_Reset();
 }
