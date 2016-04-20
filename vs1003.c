@@ -1,16 +1,17 @@
+#include <intrins.h>
 #include "vs1003.h"
 #include "queue.h"
-#include <intrins.h>
 #include "UART.h"
+//sbit VS1003_XRESET  = P2^0;
+//sbit VS1003_DREQ = P2^5;
+//sbit VS1003_XCS = P2^6;
+//sbit VS1003_XDCS  = P2^7;
+
 sbit VS1003_XRESET  = P2^4;
 sbit VS1003_XCS = P2^5;
 sbit VS1003_XDCS  = P2^6;
 sbit VS1003_DREQ = P2^7;
-//sbit c_SCI_SI = P1^3;
-//sbit c_SCI_SO = P1^4;
-//sbit c_SCI_CLK = P1^5;
-
-void Delay(unsigned int ms)		//@22.1184MHz
+void Delay(unsigned int ms)		
 {
 	unsigned char i, j;
 	while(ms--)
@@ -24,13 +25,7 @@ void Delay(unsigned int ms)		//@22.1184MHz
 	}
 }
 
-
-/**********************************************************/
-/*  函数名称 :  InitPortVS1003                            */
-/*  函数功能 ： MCU与vs1003接口的初始化                   */
-/*  参数     :  无                                        */
-/*  返回值   :  无                                        */
-/*--------------------------------------------------------*/
+//vs1003接口的初始化
 void VS1003_InitPort(void)
 {
 	VS1003_DREQ = 1;		
@@ -200,7 +195,6 @@ void VS1003_Play()
 	unsigned char i = 0;
 	while(VS1003_DREQ)
 	{		
-		//P11 = ~ P11;
 		if(PlayQueue_GetStatu() < 32)
 			return;
 		if(PlayQueue_Out(VS1003_Play_Temp, 32) == 1)
@@ -220,7 +214,7 @@ void VS1003_Record()
 	VS1003_WriteRegister(SCI_CLOCKF, 0x4430); /* 2.0x 12.288MHz */
 	Delay(5);
 	VS1003_WriteRegister(SCI_AICTRL0, 12); /* Div -> 12=8kHz 8=12kHz 6=16kHz */
-	//Delay(100);
+
 	VS1003_WriteRegister(SCI_AICTRL1, 0); /* Auto gain */
 	Delay(1);
 	
@@ -228,17 +222,13 @@ void VS1003_Record()
 	VS1003_WriteRegister(SCI_MODE, 0x1c04); 	//mic
 	/* Record loop */
 	while (RecordStatu) {
-		while(1)
+		while(wwwww < 256 || wwwww > 896)
 		{
 			wwwww = VS1003_ReadRegister(SCI_HDAT1);	
-			if(wwwww < 256)P10 = 0;
-			else if(wwwww >= 896)P11 = 0;
-			else break;	
 			//if(!RecordStatu)return ;
 			UART_Driver();
 		} /* Delay until 512 bytes available */
-		P10 = 1;
-		P11 = 1;	
+
 		ET1 = 0;
 		for(j = 0; j < 2; j++)
 		{

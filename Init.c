@@ -51,8 +51,17 @@ void WatchDogTimerFeed()
 {
 	WDT_CONTR |= 0x10;
 }
+void IOPort_Init()				//������IO������Ϊ׼˫��ڣ�15��Ƭ���е�IO��Ĭ��Ϊ���裩
+{
+	P0M0 = 0x00; P0M1 = 0x00;
+	P1M0 = 0x00; P1M1 = 0x00;
+	P2M0 = 0x00; P2M1 = 0x00;
+	P3M0 = 0x00; P3M1 = 0x00;
+	P4M0 = 0x00; P4M1 = 0x00;
+}
 void SystemInit()
 {
+	IOPort_Init();
 	VS1003_Reset();
 	Uart_Init();
 	Timer0_Init();
@@ -62,5 +71,5 @@ void SystemInit()
 	VS1003_InitPort();
 	Queue_Reset();
 	VS1003_Beep(0x44);
-	WatchDogTimerConfig();
+	WatchDogTimerConfig();	
 }
