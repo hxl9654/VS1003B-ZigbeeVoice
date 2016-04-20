@@ -2,15 +2,15 @@
 #include "vs1003.h"
 #include "queue.h"
 #include "UART.h"
-//sbit VS1003_XRESET  = P2^0;
-//sbit VS1003_DREQ = P2^5;
-//sbit VS1003_XCS = P2^6;
-//sbit VS1003_XDCS  = P2^7;
+sbit VS1003_XRESET  = P2^0;
+sbit VS1003_DREQ = P2^5;
+sbit VS1003_XCS = P2^6;
+sbit VS1003_XDCS  = P2^7;
 
-sbit VS1003_XRESET  = P2^4;
-sbit VS1003_XCS = P2^5;
-sbit VS1003_XDCS  = P2^6;
-sbit VS1003_DREQ = P2^7;
+//sbit VS1003_XRESET  = P2^4;
+//sbit VS1003_XCS = P2^5;
+//sbit VS1003_XDCS  = P2^6;
+//sbit VS1003_DREQ = P2^7;
 void Delay(unsigned int ms)		
 {
 	unsigned char i, j;
