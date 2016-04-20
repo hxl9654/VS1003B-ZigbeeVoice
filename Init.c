@@ -43,6 +43,14 @@ void SystemReset()
 	VS1003_InitPort();
 	Queue_Reset();
 }
+void WatchDogTimerConfig()
+{
+	WDT_CONTR = 0x3F;
+}
+void WatchDogTimerFeed()
+{
+	WDT_CONTR |= 0x10;
+}
 void SystemInit()
 {
 	VS1003_Reset();
@@ -54,5 +62,5 @@ void SystemInit()
 	VS1003_InitPort();
 	Queue_Reset();
 	VS1003_Beep(0x44);
-	//WatchDogTimerConfig();
+	WatchDogTimerConfig();
 }

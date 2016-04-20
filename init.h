@@ -2,4 +2,5 @@
 #define _INIT_H_
 void SystemReset();
 void SystemInit();
+void WatchDogTimerFeed();
 #endif
