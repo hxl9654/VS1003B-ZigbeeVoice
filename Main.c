@@ -1,30 +1,20 @@
-#include "stc15.h"
-#include <intrins.h>
-#include "UART.h"
-#include "queue.h"
-#include "vs1003.h"
-#include "init.h"
-sbit INT0 = P3 ^ 2;
-
-const unsigned char header[64] = {
-0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-0x00, 0x00,
-0x52, 0x49, 0x46, 0x46, 0xff, 0xff, 0xff, 0xff,
-0x57, 0x41, 0x56, 0x45, 0x66, 0x6d, 0x74, 0x20, /*|RIFF....WAVEfmt |*/
-0x12, 0x00, 0x00, 0x00, 0x01, 0x00, 0x01, 0x00,
-//0x40, 0x1f, 0x00, 0x00, 0x80, 0x3e, 0x00, 0x00, /*|........@...OE...|*/
-0xa0, 0x0f, 0x00, 0x00, 0xa0, 0x0f, 0x00, 0x00, /*|........@...OE...|*/	
-//0x02, 0x00, 0x10, 0x00, 0x00, 0x00, 0x64, 0x61,
-0x01, 0x00, 0x08, 0x00, 0x00, 0x00, 0x64, 0x61,
-0x74, 0x61, 0xff, 0xff, 0xff, 0xff
-};
-
+#include "main.h"
 bit PlayStatu = 0;
 bit RecordStatu = 0;
 bit RecordStatuStart = 0;
 bit RecordStatuStop = 0;
 unsigned char Send_Temp[270];
+void main()
+{
+	SystemInit();
+	while(1)
+	{				
+		UART_Driver();
+		if(PlayStatu)VS1003_Play();
+		else if(RecordStatu)VS1003_Record();
+		else VS1003_Fill2048Zero();
+	}
+}
 void Response()
 {
 	unsigned int RecordQueueStatu, PlayQueueStatu;
@@ -63,6 +53,7 @@ void Response()
 		UART_SendString(Send_Temp, 9);
 	}	
 	RecordStatuStop = 0;
+	WatchDogTimerFeed();
 }
 void UART_Action(unsigned char dat, unsigned char len)
 {
@@ -82,17 +73,6 @@ void UART_Action(unsigned char dat, unsigned char len)
 	if(!RecordStatu)
 		Response();
 }
-void main()
-{
-	SystemInit();
-	while(1)
-	{				
-		UART_Driver();
-		if(PlayStatu)VS1003_Play();
-		else if(RecordStatu)VS1003_Record();
-		else VS1003_Fill2048Zero();
-	}
-}
 void Timer1_Interrupt() interrupt 3
 {
 	UART_Driver();	
@@ -107,12 +87,12 @@ void Timer0_Interrupt() interrupt 1
 void INT0_Interrupt() interrupt 0
 {
 	UART_Driver();
-	if(INT0 == 1 && RecordStatu == 1)
+	if(INT0 == 0 && RecordStatu == 1)
 	{
 		RecordStatu = 0;
 		RecordStatuStop = 1;
 	}
-	else if(INT0 == 0 && RecordStatu == 0)
+	else if(INT0 == 1 && RecordStatu == 0)
 	{
 		if(PlayStatu == 0)
 		{

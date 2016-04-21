@@ -17,6 +17,5 @@ unsigned int UARTQueue_GetStatu();
 void UARTQueue_Reset();
 
 bit UARTQueue_TO_PlayQueue(unsigned int len);
-//bit RecordQueue_TO_UARTQueue(unsigned int len);
 void Queue_Reset();
 #endif // _QUEUE_H_
