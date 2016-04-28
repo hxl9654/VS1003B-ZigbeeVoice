@@ -40,7 +40,6 @@ void INT0_Init()
 void SystemReset()
 {
 	VS1003_Reset();
-	VS1003_InitPort();
 	Queue_Reset();
 }
 void WatchDogTimerConfig()
@@ -58,19 +57,18 @@ void IOPort_Init()				//将所有IO口配置为准双向口（15单片机有的IO口默认为高阻）
 	P2M0 = 0x00; P2M1 = 0x00;
 	P3M0 = 0x00; P3M1 = 0x00;
 	P4M0 = 0x00; P4M1 = 0x00;
+	AUXR1 = 0x44;		//将串口1切换到P36、P37，SPI切换到P21、P22、P23	
 }
+
 void SystemInit()
-{
+{	
+	VS1003_Init();
 	IOPort_Init();
-	AUXR1 = 0x44;		//将串口1切换到P36、P37，SPI切换到P21、P22、P23
-	VS1003_Reset();
-	Uart_Init();
+	Queue_Reset();
+	Uart_Init();	
 	Timer0_Init();
 	Timer1_Init();
 	INT0_Init();
-	Interrupt_Init();
-	VS1003_InitPort();
-	Queue_Reset();
-	VS1003_Beep(0x44);
-	WatchDogTimerConfig();	
+	Interrupt_Init();	
+	WatchDogTimerConfig();
 }

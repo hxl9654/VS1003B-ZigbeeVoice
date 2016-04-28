@@ -1,7 +1,7 @@
 #include "stc15.h"
-#define PLAYQUEUEDATALENTH 1025
-#define RECORDQUEUEDATALENTH 1025
-#define UARTQUEUEDATALENTH 1025
+#define PLAYQUEUEDATALENTH 1026
+#define RECORDQUEUEDATALENTH 1026
+#define UARTQUEUEDATALENTH 1026
 
 unsigned char PlayQueue_Data[PLAYQUEUEDATALENTH] = {0};
 unsigned int PlayQueue_Data_IndexIn = 0;
@@ -13,7 +13,7 @@ bit PlayQueue_In(unsigned char *p, unsigned int len)
     {
         PlayQueue_Data[PlayQueue_Data_IndexIn] = p[i];
         PlayQueue_Data_IndexIn++;
-        if(PlayQueue_Data_IndexIn == PLAYQUEUEDATALENTH)
+        if(PlayQueue_Data_IndexIn >= PLAYQUEUEDATALENTH)
             PlayQueue_Data_IndexIn = 0;
         if(PlayQueue_Data_IndexIn == PlayQueue_Data_IndexOut)
             return 1;
@@ -29,7 +29,7 @@ bit PlayQueue_Out(unsigned char *p, unsigned int len)
             return 1;
         p[i] = PlayQueue_Data[PlayQueue_Data_IndexOut];
         PlayQueue_Data_IndexOut++;
-        if(PlayQueue_Data_IndexOut == PLAYQUEUEDATALENTH)
+        if(PlayQueue_Data_IndexOut >= PLAYQUEUEDATALENTH)
             PlayQueue_Data_IndexOut = 0;        
     }
 	return 0;
@@ -58,7 +58,7 @@ bit RecordQueue_In(unsigned char *p, unsigned int len)
     {
         RecordQueue_Data[RecordQueue_Data_IndexIn] = p[i];
         RecordQueue_Data_IndexIn++;
-        if(RecordQueue_Data_IndexIn == RECORDQUEUEDATALENTH)
+        if(RecordQueue_Data_IndexIn >= RECORDQUEUEDATALENTH)
             RecordQueue_Data_IndexIn = 0;
         if(RecordQueue_Data_IndexIn == RecordQueue_Data_IndexOut)
             return 1;
@@ -74,7 +74,7 @@ bit RecordQueue_Out(unsigned char *p, unsigned int len)
             return 1;
         p[i] = RecordQueue_Data[RecordQueue_Data_IndexOut];
         RecordQueue_Data_IndexOut++;
-        if(RecordQueue_Data_IndexOut == RECORDQUEUEDATALENTH)
+        if(RecordQueue_Data_IndexOut >= RECORDQUEUEDATALENTH)
             RecordQueue_Data_IndexOut = 0;        
     }
 	return 0;
@@ -103,7 +103,7 @@ bit UARTQueue_In(unsigned char *p, unsigned int len)
     {
         UARTQueue_Data[UARTQueue_Data_IndexIn] = p[i];
         UARTQueue_Data_IndexIn++;
-        if(UARTQueue_Data_IndexIn == UARTQUEUEDATALENTH)
+        if(UARTQueue_Data_IndexIn >= UARTQUEUEDATALENTH)
             UARTQueue_Data_IndexIn = 0;
         if(UARTQueue_Data_IndexIn == UARTQueue_Data_IndexOut)
             return 1;
@@ -119,7 +119,7 @@ bit UARTQueue_Out(unsigned char *p, unsigned int len)
             return 1;
         p[i] = UARTQueue_Data[UARTQueue_Data_IndexOut];
         UARTQueue_Data_IndexOut++;
-        if(UARTQueue_Data_IndexOut == UARTQUEUEDATALENTH)
+        if(UARTQueue_Data_IndexOut >= UARTQUEUEDATALENTH)
             UARTQueue_Data_IndexOut = 0;        
     }
 	return 0;

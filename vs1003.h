@@ -40,13 +40,13 @@
 		
 void  VS1003_Record();
 void  VS1003_Play() ;
-void  VS1003_InitPort(void);//LPC213x与vs1003的接口的初始化
 void  VS1003_SoftReset(void);//vs1003的软件复位	
 void  VS1003_Reset(void);//vs1003的硬件复位
-void  VS1003_Beep(unsigned char f);//vs1003的正弦测试
 void  VS1003_WriteRegister(unsigned char addressbyte,unsigned int databyte);//写vs1003寄存器
 unsigned int VS1003_ReadRegister(unsigned char addressbyte);//读vs1003寄存器
 void VS1003_Fill2048Zero();
+void VS1003_OutOfWAV();
+void VS1003_Init();
 
 
 

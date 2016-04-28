@@ -25,7 +25,7 @@ void UART_SendString(unsigned char *dat,unsigned int len);
 *函数功能：串口通信监控函数，在主循环中调用。
 *           如果接收到字符串，会自动调用另行编写的UART_Action(unsigned char *dat,unsigned char len)
 *////////////////////////////////////////////////////////////////////////////////////
-void UART_Driver();
+void UART_Driver() small reentrant;
 
 
 #endif // _HEAD_UART_
