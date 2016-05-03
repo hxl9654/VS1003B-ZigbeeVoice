@@ -39,7 +39,7 @@ void INT0_Init()
 }
 void SystemReset()
 {
-	VS1003_Reset();
+	VS1003_Init();
 	Queue_Reset();
 }
 void WatchDogTimerConfig()

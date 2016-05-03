@@ -62,6 +62,8 @@ void Response()
 		Send_Temp[8] = 0x00;
 		UART_SendString(Send_Temp, 9);
 	}	
+	if(RecordStatuStop)
+		IAP_CONTR = 0x20;	//Èí¼þ¸´Î»
 	RecordStatuStop = 0;	
 	Response_WorkingFlag = 0;
 	if(MainLoopNormalFlag)

@@ -7,10 +7,6 @@ sbit VS1003_DREQ = P2^5;
 sbit VS1003_XCS = P2^6;
 sbit VS1003_XDCS  = P2^7;
 
-//sbit VS1003_XRESET  = P2^4;
-//sbit VS1003_XCS = P2^5;
-//sbit VS1003_XDCS  = P2^6;
-//sbit VS1003_DREQ = P2^7;
 void Delay(unsigned int ms)		
 {
 	unsigned char i, j;
@@ -95,14 +91,15 @@ unsigned int VS1003_ReadRegister(unsigned char addressbyte)
 //vs1003软件复位
 void VS1003_SoftReset(void)
 {
-	VS1003_InitPort();
-	VS1003_WriteRegister(SCI_MODE, 0x0c0c); //软件复位
-	
-	while (VS1003_DREQ == 0); //等待软件复位结束
+	VS1003_InitPort();	
 	VS1003_WriteRegister(SCI_BASS, 0); /* Bass/treble disabled */
 	VS1003_WriteRegister(SCI_CLOCKF, 0x4430);
-	VS1003_SetVolume(0x1414);//设置音量
+	VS1003_SetVolume(0x0000);//设置音量
     	
+	VS1003_WriteRegister(SCI_MODE, 0x0c0c); //软件复位	
+	Delay(100);//延时100ms
+	while (VS1003_DREQ == 0); //等待软件复位结束
+	
     //向vs1003发送4个字节无效数据，用以启动SPI发送
    	VS1003_XDCS = 0;
 	SPI_SendByte(0);
@@ -123,9 +120,11 @@ void VS1003_Reset(void)
 	while (VS1003_DREQ == 0);//等待DREQ为高
     VS1003_SoftReset();//vs1003软复位
 }
-//复位两次，确保正确
+//复位3次，确保正确
 void VS1003_Init()
 {
+	VS1003_Reset();
+	Delay(100);
 	VS1003_Reset();
 	Delay(100);
 	VS1003_Reset();
@@ -180,7 +179,7 @@ unsigned char db[256] = {0};
 void VS1003_Record()
 {
 	unsigned int wwwww = 0, idx = 0, i, j;
-	VS1003_SetVolume(0x1414); /* Recording monitor volume */
+	VS1003_SetVolume(0xFEFE); /* Recording monitor volume */
 	VS1003_WriteRegister(SCI_BASS, 0); /* Bass/treble disabled */
 	VS1003_WriteRegister(SCI_CLOCKF, 0x4430); /* 2.0x 12.288MHz */
 	Delay(5);
@@ -215,6 +214,5 @@ void VS1003_Record()
 			MainLoopNormalFlag = 1;
 		}		
 	}	
-	VS1003_Init();
 	ET1 = 1;
 }
