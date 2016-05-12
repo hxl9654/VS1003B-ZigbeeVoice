@@ -1,4 +1,4 @@
-# Windows image file caches
+﻿# Windows image file caches
 Thumbs.db
 ehthumbs.db
 
@@ -49,6 +49,7 @@ Temporary Items
 *.hxl
 *.bak
 /listings
+/pcb
 /objects
 *.OBJ
 *.LST
@@ -63,3 +64,4 @@ TestMain - 副本.c
 1
 1.plg
 论文.odt
+*.odg
